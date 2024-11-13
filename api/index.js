@@ -9,11 +9,16 @@ app.use(cors());
 app.use(bodyParser.json());
 
 let contacts = [
-  { id: 1, name: "John Doe", phone: "123-456-7890", email: "john@example.com" },
+  {
+    id: 1,
+    name: "John Doe",
+    phone: "+7(123)456-7890",
+    email: "john@example.com",
+  },
   {
     id: 2,
     name: "Jane Smith",
-    phone: "987-654-3210",
+    phone: "+7(989)654-3210",
     email: "jane@example.com",
   },
 ];

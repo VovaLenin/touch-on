@@ -7,14 +7,30 @@
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700">Name</label>
         <input v-model="form.name" type="text" class="input-field" required />
+        <span v-if="errors.name" class="text-red-500 text-sm">{{
+          errors.name
+        }}</span>
       </div>
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700">Phone</label>
-        <input v-model="form.phone" type="text" class="input-field" required />
+        <imask-input
+          v-model="form.phone"
+          type="text"
+          class="input-field"
+          required
+          placeholder="+7 (___) ___-__-__"
+          :mask="'+7 (000) 000-00-00'"
+        />
+        <span v-if="errors.phone" class="text-red-500 text-sm">{{
+          errors.phone
+        }}</span>
       </div>
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700">Email</label>
         <input v-model="form.email" type="email" class="input-field" required />
+        <span v-if="errors.email" class="text-red-500 text-sm">{{
+          errors.email
+        }}</span>
       </div>
       <div class="flex gap-2">
         <button type="submit" class="btn-primary">
@@ -31,6 +47,7 @@
 <script lang="ts">
 import { defineComponent, PropType, reactive, watch, computed } from "vue";
 import type { Contact } from "../types";
+import { IMaskComponent } from "vue-imask";
 
 export default defineComponent({
   name: "ContactForm",
@@ -40,11 +57,21 @@ export default defineComponent({
       default: null,
     },
   },
+  components: {
+    "imask-input": IMaskComponent,
+  },
   emits: ["addContact", "updateContact"],
   setup(props, { emit }) {
     // Реактивное состояние формы
     const form = reactive<Contact>({
       id: Date.now(),
+      name: "",
+      phone: "",
+      email: "",
+    });
+
+    // Validation errors
+    const errors = reactive({
       name: "",
       phone: "",
       email: "",
@@ -59,7 +86,40 @@ export default defineComponent({
       form.name = "";
       form.phone = "";
       form.email = "";
+      clearErrors();
       //   emit("updateContact", null);
+    };
+
+    // Validation function
+    const validateForm = () => {
+      clearErrors();
+      let isValid = true;
+
+      if (!form.name) {
+        errors.name = "Name is required";
+        isValid = false;
+      }
+
+      if (!form.phone) {
+        errors.phone = "Phone number is required";
+        isValid = false;
+      }
+
+      if (!form.email) {
+        errors.email = "Email is required";
+        isValid = false;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+        errors.email = "Invalid email format";
+        isValid = false;
+      }
+
+      return isValid;
+    };
+
+    const clearErrors = () => {
+      errors.name = "";
+      errors.phone = "";
+      errors.email = "";
     };
 
     // Отслеживать изменения в editingContact и заполнять форму при редактировании
@@ -80,6 +140,7 @@ export default defineComponent({
 
     // Метод обработки отправки формы
     const handleSubmit = () => {
+      if (!validateForm()) return;
       if (isEditing.value) {
         emit("updateContact", { ...form });
       } else {
@@ -90,6 +151,7 @@ export default defineComponent({
 
     return {
       form,
+      errors,
       isEditing,
       handleSubmit,
       resetForm,

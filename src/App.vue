@@ -51,31 +51,28 @@ export default defineComponent({
 
     // Получение контактов при загрузке компонента
     const loadContacts = async () => {
-      contacts.value = await fetchContacts();
-    };
+      const savedContacts = localStorage.getItem("contacts");
+      if (savedContacts) {
+        contacts.value = JSON.parse(savedContacts);
+      }
 
-    // // Методы для обработки действий с контактами
-    // const addContact = (contact: Contact) => {
-    //   contacts.value.push(contact);
-    // };
+      try {
+        const fetchedContacts = await fetchContacts();
+        contacts.value = fetchedContacts;
+        localStorage.setItem("contacts", JSON.stringify(fetchedContacts)); // Сохранение в localStorage
+        // console.log("localStorage usage");
+      } catch (error) {
+        console.error("Failed to load contacts from API:", error);
+      }
+    };
 
     // Добавление нового контакта
     const addNewContact = async (contact: Contact) => {
       const newContact = await addContact(contact);
       contacts.value.push(newContact);
+      localStorage.setItem("contacts", JSON.stringify(contacts.value)); // Обновляем localStorage
+      // console.log("localStorage usage");
     };
-
-    // const updateContact = (updatedContact: Contact) => {
-    //   console.log("contacts.value", contacts.value);
-    //   console.log("updateContact.id", updatedContact);
-
-    //   const index = contacts.value.findIndex((c) => c.id === updatedContact.id);
-    //   if (index !== -1) {
-    //     contacts.value[index] = updatedContact; // Обновление существующего контакта
-    //   }
-    //   editingContact.value = null; // Сброс `editingContact` после редактирования
-    // };
-
     // Обновление контакта
     const updateExistingContact = async (updatedContact: Contact) => {
       const contact = await updateContact(updatedContact);
@@ -83,16 +80,12 @@ export default defineComponent({
         const index = contacts.value.findIndex((c) => c.id === contact.id);
         if (index !== -1) {
           contacts.value[index] = contact;
+          localStorage.setItem("contacts", JSON.stringify(contacts.value)); // Обновляем localStorage
+          // console.log("localStorage usage");
         }
       }
       editingContact.value = null;
     };
-
-    // const deleteContact = (contactId: number) => {
-    //   contacts.value = contacts.value.filter(
-    //     (contact) => contact.id !== contactId
-    //   );
-    // };
 
     // Удаление контакта
     const deleteExistingContact = async (contactId: number) => {
@@ -101,6 +94,8 @@ export default defineComponent({
         contacts.value = contacts.value.filter(
           (contact) => contact.id !== contactId
         );
+        localStorage.setItem("contacts", JSON.stringify(contacts.value)); // Обновляем localStorage
+        // console.log("localStorage usage");
       }
     };
 
