@@ -1,6 +1,6 @@
 <template>
   <div class="contact-list">
-    <ul>
+    <transition-group name="contact" tag="ul">
       <!-- Компонент для отображения одного контакта -->
       <ContactItem
         v-for="contact in contacts"
@@ -9,7 +9,7 @@
         @delete="handleDelete(contact.id)"
         @edit="handleEdit(contact)"
       />
-    </ul>
+    </transition-group>
   </div>
 </template>
 
@@ -50,5 +50,16 @@ export default defineComponent({
 <style scoped>
 .contact-list {
   margin: 16px 0 30px;
+}
+
+/* Анимации для контактов */
+.contact-enter-active,
+.contact-leave-active {
+  transition: all 0.5s ease;
+}
+.contact-enter,
+.contact-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>

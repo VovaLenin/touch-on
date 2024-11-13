@@ -8,10 +8,18 @@
       <p class="text-sm text-gray-600">Email: {{ contact.email }}</p>
     </div>
     <div class="contact-actions flex gap-2">
-      <button @click="editContact" class="text-blue-500 hover:underline">
+      <button
+        @click="editContact"
+        class="text-blue-500 hover:underline"
+        data-testid="edit-button"
+      >
         Edit
       </button>
-      <button @click="deleteContact" class="text-red-500 hover:underline">
+      <button
+        @click="deleteContact"
+        class="text-red-500 hover:underline"
+        data-testid="delete-button"
+      >
         Delete
       </button>
     </div>
