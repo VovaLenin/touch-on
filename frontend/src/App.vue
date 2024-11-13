@@ -52,6 +52,7 @@ export default defineComponent({
     // Получение контактов при загрузке компонента
     const loadContacts = async () => {
       const savedContacts = localStorage.getItem("contacts");
+
       if (savedContacts) {
         contacts.value = JSON.parse(savedContacts);
       }
@@ -60,7 +61,6 @@ export default defineComponent({
         const fetchedContacts = await fetchContacts();
         contacts.value = fetchedContacts;
         localStorage.setItem("contacts", JSON.stringify(fetchedContacts)); // Сохранение в localStorage
-        // console.log("localStorage usage");
       } catch (error) {
         console.error("Failed to load contacts from API:", error);
       }
@@ -71,7 +71,6 @@ export default defineComponent({
       const newContact = await addContact(contact);
       contacts.value.push(newContact);
       localStorage.setItem("contacts", JSON.stringify(contacts.value)); // Обновляем localStorage
-      // console.log("localStorage usage");
     };
     // Обновление контакта
     const updateExistingContact = async (updatedContact: Contact) => {
@@ -81,7 +80,6 @@ export default defineComponent({
         if (index !== -1) {
           contacts.value[index] = contact;
           localStorage.setItem("contacts", JSON.stringify(contacts.value)); // Обновляем localStorage
-          // console.log("localStorage usage");
         }
       }
       editingContact.value = null;
@@ -95,7 +93,6 @@ export default defineComponent({
           (contact) => contact.id !== contactId
         );
         localStorage.setItem("contacts", JSON.stringify(contacts.value)); // Обновляем localStorage
-        // console.log("localStorage usage");
       }
     };
 
