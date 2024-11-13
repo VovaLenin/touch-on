@@ -34,8 +34,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.input-field {
-  max-width: 400px;
+.search-bar {
   margin: 0 auto;
 }
 </style>

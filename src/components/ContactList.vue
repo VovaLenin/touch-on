@@ -49,6 +49,6 @@ export default defineComponent({
 
 <style scoped>
 .contact-list {
-  margin-top: 16px;
+  margin: 16px 0 30px;
 }
 </style>

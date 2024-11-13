@@ -2,30 +2,38 @@
   <div class="app-container p-6 bg-gray-100 min-h-screen">
     <h1 class="text-3xl font-bold text-center mb-8">Contact Management</h1>
 
-    <!-- Компонент для поиска контактов -->
-    <SearchBar @search="handleSearch" />
+    <div class="components-wrapper">
+      <!-- Компонент для поиска контактов -->
+      <SearchBar @search="handleSearch" />
 
-    <!-- Компонент для отображения списка контактов -->
-    <ContactList
-      :contacts="filteredContacts"
-      @deleteContact="deleteContact"
-      @editContact="editContact"
-    />
+      <!-- Компонент для отображения списка контактов -->
+      <ContactList
+        :contacts="filteredContacts"
+        @deleteContact="deleteExistingContact"
+        @editContact="editContact"
+      />
 
-    <!-- Компонент для добавления и редактирования контактов. -->
-    <ContactForm
-      @addContact="addContact"
-      @updateContact="updateContact"
-      :editingContact="editingContact"
-    />
+      <!-- Компонент для добавления и редактирования контактов. -->
+      <ContactForm
+        @addContact="addNewContact"
+        @updateContact="updateExistingContact"
+        :editingContact="editingContact"
+      />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from "vue";
+import { defineComponent, ref, computed, onMounted } from "vue";
 import SearchBar from "./components/SearchBar.vue";
 import ContactList from "./components/ContactList.vue";
 import ContactForm from "./components/ContactForm.vue";
+import {
+  fetchContacts,
+  addContact,
+  updateContact,
+  deleteContact,
+} from "./apiService";
 import type { Contact } from "./types";
 
 export default defineComponent({
@@ -41,6 +49,71 @@ export default defineComponent({
     const searchQuery = ref("");
     const editingContact = ref<Contact | null>(null);
 
+    // Получение контактов при загрузке компонента
+    const loadContacts = async () => {
+      contacts.value = await fetchContacts();
+    };
+
+    // // Методы для обработки действий с контактами
+    // const addContact = (contact: Contact) => {
+    //   contacts.value.push(contact);
+    // };
+
+    // Добавление нового контакта
+    const addNewContact = async (contact: Contact) => {
+      const newContact = await addContact(contact);
+      contacts.value.push(newContact);
+    };
+
+    // const updateContact = (updatedContact: Contact) => {
+    //   console.log("contacts.value", contacts.value);
+    //   console.log("updateContact.id", updatedContact);
+
+    //   const index = contacts.value.findIndex((c) => c.id === updatedContact.id);
+    //   if (index !== -1) {
+    //     contacts.value[index] = updatedContact; // Обновление существующего контакта
+    //   }
+    //   editingContact.value = null; // Сброс `editingContact` после редактирования
+    // };
+
+    // Обновление контакта
+    const updateExistingContact = async (updatedContact: Contact) => {
+      const contact = await updateContact(updatedContact);
+      if (contact) {
+        const index = contacts.value.findIndex((c) => c.id === contact.id);
+        if (index !== -1) {
+          contacts.value[index] = contact;
+        }
+      }
+      editingContact.value = null;
+    };
+
+    // const deleteContact = (contactId: number) => {
+    //   contacts.value = contacts.value.filter(
+    //     (contact) => contact.id !== contactId
+    //   );
+    // };
+
+    // Удаление контакта
+    const deleteExistingContact = async (contactId: number) => {
+      const success = await deleteContact(contactId);
+      if (success) {
+        contacts.value = contacts.value.filter(
+          (contact) => contact.id !== contactId
+        );
+      }
+    };
+
+    // Метод для установки контакта на редактирование
+    const editContact = (contact: Contact) => {
+      editingContact.value = { ...contact };
+    };
+
+    // Обработка поиска
+    const handleSearch = (query: string) => {
+      searchQuery.value = query;
+    };
+
     // Вычисляемое свойство для отфильтрованных контактов
     const filteredContacts = computed(() => {
       return contacts.value.filter((contact) =>
@@ -48,46 +121,19 @@ export default defineComponent({
       );
     });
 
-    // Методы для обработки действий с контактами
-    const addContact = (contact: Contact) => {
-      contacts.value.push(contact);
-    };
-
-    const updateContact = (updatedContact: Contact) => {
-      console.log("contacts.value", contacts.value);
-      console.log("updateContact.id", updatedContact);
-
-      const index = contacts.value.findIndex((c) => c.id === updatedContact.id);
-      if (index !== -1) {
-        contacts.value[index] = updatedContact; // Обновление существующего контакта
-      }
-      editingContact.value = null; // Сброс `editingContact` после редактирования
-    };
-
-    const deleteContact = (contactId: number) => {
-      contacts.value = contacts.value.filter(
-        (contact) => contact.id !== contactId
-      );
-    };
-
-    const editContact = (contact: Contact) => {
-      editingContact.value = { ...contact };
-    };
-
-    const handleSearch = (query: string) => {
-      searchQuery.value = query;
-    };
+    // Загружаем контакты при монтировании компонента
+    onMounted(loadContacts);
 
     return {
       contacts,
       searchQuery,
       filteredContacts,
       editingContact,
-      addContact,
-      deleteContact,
+      addNewContact,
+      updateExistingContact,
+      deleteExistingContact,
       editContact,
       handleSearch,
-      updateContact,
     };
   },
 });
@@ -96,6 +142,10 @@ export default defineComponent({
 <style scoped>
 .app-container {
   max-width: 800px;
+  margin: 0 auto;
+}
+.components-wrapper {
+  max-width: 400px;
   margin: 0 auto;
 }
 </style>
