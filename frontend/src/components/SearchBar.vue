@@ -10,27 +10,17 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { defineEmits, ref } from "vue";
 
-export default defineComponent({
-  name: "SearchBar",
-  emits: ["search"],
-  setup(_, { emit }) {
-    // Состояние параметров поиска
-    const query = ref("");
+const emit = defineEmits(["search"]);
+// Состояние параметров поиска
+const query = ref("");
 
-    // Метод обработки ввода в поле поиска
-    const handleInput = () => {
-      emit("search", query.value);
-    };
-
-    return {
-      query,
-      handleInput,
-    };
-  },
-});
+// Метод обработки ввода в поле поиска
+const handleInput = () => {
+  emit("search", query.value);
+};
 </script>
 
 <style scoped>

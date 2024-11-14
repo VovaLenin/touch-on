@@ -12,13 +12,13 @@ let contacts = [
   {
     id: 1,
     name: "John Doe",
-    phone: "+7(123)456-7890",
+    phone: "+7 (123) 456-78-90",
     email: "john@example.com",
   },
   {
     id: 2,
     name: "Jane Smith",
-    phone: "+7(989)654-3210",
+    phone: "+7 (989) 654-32-10",
     email: "jane@example.com",
   },
 ];

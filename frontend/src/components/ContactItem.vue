@@ -26,34 +26,25 @@
   </li>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { defineProps, defineEmits, PropType } from "vue";
 import type { Contact } from "../types";
 
-export default defineComponent({
-  name: "ContactItem",
-  props: {
-    contact: {
-      type: Object as PropType<Contact>,
-      required: true,
-    },
-  },
-  emits: ["delete", "edit"],
-  setup(props, { emit }) {
-    const deleteContact = () => {
-      emit("delete", props.contact.id);
-    };
-
-    const editContact = () => {
-      emit("edit", props.contact);
-    };
-
-    return {
-      deleteContact,
-      editContact,
-    };
+const props = defineProps({
+  contact: {
+    type: Object as PropType<Contact>,
+    required: true,
   },
 });
+const emit = defineEmits(["delete", "edit"]);
+
+const deleteContact = () => {
+  emit("delete", props.contact.id);
+};
+
+const editContact = () => {
+  emit("edit", props.contact);
+};
 </script>
 
 <style scoped>

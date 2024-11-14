@@ -13,7 +13,7 @@
       </div>
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700">Phone</label>
-        <imask-input
+        <i-mask-component
           v-model="form.phone"
           type="text"
           class="input-field"
@@ -44,120 +44,111 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType, reactive, watch, computed } from "vue";
+<script setup lang="ts">
+import {
+  defineProps,
+  defineEmits,
+  PropType,
+  reactive,
+  watch,
+  computed,
+} from "vue";
 import type { Contact } from "../types";
 import { IMaskComponent } from "vue-imask";
 
-export default defineComponent({
-  name: "ContactForm",
-  props: {
-    editingContact: {
-      type: Object as PropType<Contact | null>,
-      default: null,
-    },
-  },
-  components: {
-    "imask-input": IMaskComponent,
-  },
-  emits: ["addContact", "updateContact"],
-  setup(props, { emit }) {
-    // Реактивное состояние формы
-    const form = reactive<Contact>({
-      id: Date.now(),
-      name: "",
-      phone: "",
-      email: "",
-    });
-
-    // Validation errors
-    const errors = reactive({
-      name: "",
-      phone: "",
-      email: "",
-    });
-
-    // Определить, редактируется ли существующий контакт
-    const isEditing = computed(() => !!props.editingContact);
-
-    // Откат формы к исходному состоянию
-    const resetForm = () => {
-      form.id = Date.now();
-      form.name = "";
-      form.phone = "";
-      form.email = "";
-      clearErrors();
-      //   emit("updateContact", null);
-    };
-
-    // Validation function
-    const validateForm = () => {
-      clearErrors();
-      let isValid = true;
-
-      if (!form.name) {
-        errors.name = "Name is required";
-        isValid = false;
-      }
-
-      if (!form.phone) {
-        errors.phone = "Phone number is required";
-        isValid = false;
-      }
-
-      if (!form.email) {
-        errors.email = "Email is required";
-        isValid = false;
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-        errors.email = "Invalid email format";
-        isValid = false;
-      }
-
-      return isValid;
-    };
-
-    const clearErrors = () => {
-      errors.name = "";
-      errors.phone = "";
-      errors.email = "";
-    };
-
-    // Отслеживать изменения в editingContact и заполнять форму при редактировании
-    watch(
-      () => props.editingContact,
-      (newContact) => {
-        if (newContact) {
-          form.id = newContact.id;
-          form.name = newContact.name;
-          form.phone = newContact.phone;
-          form.email = newContact.email;
-        } else {
-          resetForm();
-        }
-      },
-      { immediate: true }
-    );
-
-    // Метод обработки отправки формы
-    const handleSubmit = () => {
-      if (!validateForm()) return;
-      if (isEditing.value) {
-        emit("updateContact", { ...form });
-      } else {
-        emit("addContact", { ...form, id: Date.now() });
-      }
-      resetForm();
-    };
-
-    return {
-      form,
-      errors,
-      isEditing,
-      handleSubmit,
-      resetForm,
-    };
+const props = defineProps({
+  editingContact: {
+    type: Object as PropType<Contact | null>,
+    default: null,
   },
 });
+const emit = defineEmits(["addContact", "updateContact"]);
+// Реактивное состояние формы
+const form = reactive<Contact>({
+  id: Date.now(),
+  name: "",
+  phone: "",
+  email: "",
+});
+
+// Ошибка валидации
+const errors = reactive({
+  name: "",
+  phone: "",
+  email: "",
+});
+
+// Определить, редактируется ли существующий контакт
+const isEditing = computed(() => !!props.editingContact);
+
+// Откат формы к исходному состоянию
+const resetForm = () => {
+  form.id = Date.now();
+  form.name = "";
+  form.phone = "";
+  form.email = "";
+  clearErrors();
+  //   emit("updateContact", null);
+};
+
+// Validation function
+const validateForm = () => {
+  clearErrors();
+  let isValid = true;
+
+  if (!form.name) {
+    errors.name = "Name is required";
+    isValid = false;
+  }
+
+  if (!form.phone) {
+    errors.phone = "Phone number is required";
+    isValid = false;
+  }
+
+  if (!form.email) {
+    errors.email = "Email is required";
+    isValid = false;
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    errors.email = "Invalid email format";
+    isValid = false;
+  }
+
+  return isValid;
+};
+
+const clearErrors = () => {
+  errors.name = "";
+  errors.phone = "";
+  errors.email = "";
+};
+
+// Отслеживать изменения в editingContact и заполнять форму при редактировании
+watch(
+  () => props.editingContact,
+  (newContact) => {
+    if (newContact) {
+      form.id = newContact.id;
+      form.name = newContact.name;
+      form.phone = newContact.phone;
+      form.email = newContact.email;
+    } else {
+      resetForm();
+    }
+  },
+  { immediate: true }
+);
+
+// Метод обработки отправки формы
+const handleSubmit = () => {
+  if (!validateForm()) return;
+  if (isEditing.value) {
+    emit("updateContact", { ...form });
+  } else {
+    emit("addContact", { ...form, id: Date.now() });
+  }
+  resetForm();
+};
 </script>
 
 <style scoped>

@@ -13,38 +13,23 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { defineProps, defineEmits } from "vue";
 import ContactItem from "./ContactItem.vue";
 import type { Contact } from "../types";
 
-export default defineComponent({
-  name: "ContactList",
-  components: {
-    ContactItem,
-  },
-  props: {
-    contacts: {
-      type: Array as PropType<Contact[]>,
-      required: true,
-    },
-  },
-  emits: ["deleteContact", "editContact"],
-  setup(props, { emit }) {
-    const handleDelete = (contactId: number) => {
-      emit("deleteContact", contactId);
-    };
+defineProps<{
+  contacts: Contact[];
+}>();
 
-    const handleEdit = (contact: Contact) => {
-      emit("editContact", contact);
-    };
+const emit = defineEmits(["deleteContact", "editContact"]);
+const handleDelete = (contactId: number) => {
+  emit("deleteContact", contactId);
+};
 
-    return {
-      handleDelete,
-      handleEdit,
-    };
-  },
-});
+const handleEdit = (contact: Contact) => {
+  emit("editContact", contact);
+};
 </script>
 
 <style scoped>
